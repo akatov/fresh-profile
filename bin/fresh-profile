@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+FRESH_PATH="${FRESH_PATH:-$HOME/.fresh}"
+FRESH_LOCAL="${FRESH_LOCAL:-$HOME/.dotfiles}"
+
+if [[ $# -gt 1 ]] || [[ "$1" == -* ]]; then
+  echo "usage: fresh profile [profile_name]" >&2
+  exit 1
+fi
+
+PROFILE=$1 fresh install
