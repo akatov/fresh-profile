@@ -2,10 +2,39 @@
 
 FRESH_PATH="${FRESH_PATH:-$HOME/.fresh}"
 FRESH_LOCAL="${FRESH_LOCAL:-$HOME/.dotfiles}"
+PROFILE="${PROFILE:-}"
 
-if [[ $# -gt 1 ]] || [[ "$1" == -* ]]; then
-  echo "usage: fresh profile [profile_name]" >&2
-  exit 1
+if [[ "$1" == "--help" ]]; then
+  echo "usage: fresh profile" >&2
+  echo "       fresh profile personal work" >&2
+  echo "       fresh profile -personal" >&2
+  echo "       fresh profile +work" >&2
+  exit 0
 fi
 
-PROFILE=$1 fresh install
+to_add=()
+to_remove=()
+to_replace=()
+
+for p in $@; do
+  if [[ "$p" == +* ]]; then
+    to_add=("${to_add[@]}" ${p:1:999})
+  elif [[ "$p" == -* ]]; then
+    to_remove=("${to_remove[@]}" ${p:1:999})
+  else
+    to_replace=("${to_replace[@]}" $p)
+  fi
+done
+
+if [[ ${#to_replace} -gt 0 ]]; then
+  PROFILE=("${to_add[@]}" "${to_replace[@]}")
+else
+  for p in ${to_add[@]}; do
+    PROFILE=("${PROFILE[@]}" $p)
+  done
+  for p in ${to_remove[@]}; do
+    declare -a PROFILE=( ${PROFILE[@]/$p/} )
+  done
+fi
+
+PROFILE="${PROFILE[@]}" fresh install
