@@ -43,3 +43,5 @@ else
 fi
 
 PROFILE="${PROFILE[@]}" fresh install
+
+[[ -n $SHELL ]] && exec $SHELL # reload shell
