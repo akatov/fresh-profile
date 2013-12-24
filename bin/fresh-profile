@@ -4,6 +4,11 @@ FRESH_PATH="${FRESH_PATH:-$HOME/.fresh}"
 FRESH_LOCAL="${FRESH_LOCAL:-$HOME/.dotfiles}"
 PROFILE="${PROFILE:-}"
 
+if [[ $# -eq 0 ]]; then
+  echo $PROFILE
+  exit 0
+fi
+
 if [[ "$1" == "--help" ]]; then
   echo "usage: fresh profile" >&2
   echo "       fresh profile personal work" >&2
