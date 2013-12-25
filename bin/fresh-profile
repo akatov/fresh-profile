@@ -1,47 +1,45 @@
-#!/bin/bash -e
+#!/usr/bin/env bash -e
+# need bash version 4 or higher
 
 FRESH_PATH="${FRESH_PATH:-$HOME/.fresh}"
 FRESH_LOCAL="${FRESH_LOCAL:-$HOME/.dotfiles}"
-PROFILE="${PROFILE:-}"
+ORIGINAL_PROFILE="${FRESH_PROFILE:-}"
 
 if [[ $# -eq 0 ]]; then
-  echo $PROFILE
+  echo $FRESH_PROFILE
   exit 0
 fi
 
 if [[ "$1" == "--help" ]]; then
-  echo "usage: fresh profile" >&2
-  echo "       fresh profile personal work" >&2
-  echo "       fresh profile -personal" >&2
-  echo "       fresh profile +work" >&2
+  echo "usage: fresh profile                      - show profile" >&2
+  echo "       fresh profile aws:work1 emacs:live - set aws and emacs" >&2
+  echo "       fresh profile aws:                 - unset aws" >&2
   exit 0
 fi
 
-to_add=()
-to_remove=()
-to_replace=()
+declare -A profile=()
 
-for p in $@; do
-  if [[ "$p" == +* ]]; then
-    to_add=("${to_add[@]}" ${p:1:999})
-  elif [[ "$p" == -* ]]; then
-    to_remove=("${to_remove[@]}" ${p:1:999})
-  else
-    to_replace=("${to_replace[@]}" $p)
+for e in $ORIGINAL_PROFILE; do
+  key="${e%%:*}"
+  val="${e##*:}"
+  profile["$key"]="$val"
+done
+
+for e in $@; do
+  key="${e%%:*}"
+  val="${e##*:}"
+  profile["$key"]="$val"
+done
+
+FRESH_PROFILE=""
+
+for k in "${!profile[@]}"; do
+  v="${profile[$k]}"
+  if [[ -n "$v" ]]; then
+    FRESH_PROFILE="$FRESH_PROFILE $k:${profile[$k]}"
   fi
 done
 
-if [[ ${#to_replace} -gt 0 ]]; then
-  PROFILE=("${to_add[@]}" "${to_replace[@]}")
-else
-  for p in ${to_add[@]}; do
-    PROFILE=("${PROFILE[@]}" $p)
-  done
-  for p in ${to_remove[@]}; do
-    declare -a PROFILE=( ${PROFILE[@]/$p/} )
-  done
-fi
-
-PROFILE="${PROFILE[@]}" fresh install
+FRESH_PROFILE="$FRESH_PROFILE" fresh install
 
 [[ -n $SHELL ]] && exec $SHELL # reload shell

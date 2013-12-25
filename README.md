@@ -25,10 +25,8 @@ fresh akatov/fresh-profile bin/fresh-profile --bin
 ```bash
 # usage instructions
 fresh profile --help
-# set $PROFILE to "personal emacs-live"
-fresh profile personal emacs-live
-# add work to $PROFILE
-fresh profile +work
-# remove personal from $PROFILE
-fresh profile -personal
+# set work profile to personal and emacs profile to live
+fresh profile work:personal emacs:live
+# unset work and emacs profiles
+fresh profile work: emacs:
 ```
